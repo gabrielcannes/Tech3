@@ -1,10 +1,8 @@
 import copy
+import sys
 import types
 from functools import partial
 from pathlib import Path
-
-import mlx.core as mx
-from mlx_lm.lora import CONFIG_DEFAULTS, run
 
 from config import (
     MODEL_PATH,
@@ -21,6 +19,15 @@ from config import (
 
 
 def main():
+    if sys.platform == "win32":
+        from train_windows import main as train_windows
+
+        train_windows()
+        return
+
+    import mlx.core as mx
+    from mlx_lm.lora import CONFIG_DEFAULTS, run
+
     data_output = Path(DATA_OUTPUT)
     adapter_path = Path(ADAPTER_PATH)
 
