@@ -76,13 +76,3 @@ Na execução de `src/assistant.py --demo` em 20/11/2026, os quatro cenários ti
 | Prontuário `PAC-999` | Registrou `found=false` na consulta e retornou `paciente_nao_encontrado`, sem chamar o modelo. |
 
 A auditoria registrou a validação da ação e da fonte nas duas consultas respondidas. A primeira levou 17,26 s, incluindo o carregamento inicial do modelo. A segunda, com o modelo carregado, levou 1,75 s.
-
-## Roteiro do vídeo de até 15 minutos
-
-| Tempo | O que mostrar |
-| --- | --- |
-| 0–2 min | Apresente o cenário, os protocolos fictícios e a divisão dos dados. |
-| 2–5 min | Mostre o comando de fine-tuning, o adapter gerado, as métricas e um caso de comparação entre os modelos. |
-| 5–9 min | Mostre o diagrama e execute `src/assistant.py --demo`, destacando os exames pendentes, o consentimento e as fontes. |
-| 9–12 min | Mostre o pedido encaminhado à equipe e relacione o `request_id` aos eventos de triagem, consulta e validação no log. |
-| 12–13 min | Resuma os resultados observados e as limitações do conjunto sintético. |

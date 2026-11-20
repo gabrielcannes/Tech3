@@ -166,8 +166,8 @@ exemplos hospitalares de teste, use estes comandos.
 ```
 
 O resultado inclui um `request_id` que permite localizar as etapas da mesma
-solicitação no log. O [relatório técnico](RELATORIO_TECNICO.md) reúne o diagrama,
-os critérios de avaliação e o roteiro do vídeo.
+solicitação no log. O [relatório técnico](RELATORIO_TECNICO.md) reúne o diagrama
+do fluxo e os resultados da avaliação.
 
 ## macOS com Apple Silicon
 
