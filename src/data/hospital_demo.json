@@ -1,0 +1,59 @@
+{
+  "description": "Dados inteiramente sintéticos de um hospital fictício. As regras operacionais e os modelos de documentos servem à demonstração acadêmica.",
+  "protocols": [
+    {
+      "id": "PROTO-EXAMES",
+      "title": "Acompanhamento de exames",
+      "text": "Um exame solicitado ou em análise permanece pendente. Somente um resultado registrado como liberado pode ser descrito como disponível. Um exame cancelado deve ser informado separadamente. Em caso de divergência entre a solicitação e o registro de resultados, indicar a divergência e solicitar conferência pela equipe responsável."
+    },
+    {
+      "id": "PROTO-LAUDOS",
+      "title": "Modelo interno de laudo",
+      "text": "O rascunho de laudo possui identificador do exame, descrição dos achados registrados, limitações e conclusão. Marcar cada campo sem evidência como não informado. Um rascunho permanece pendente até revisão e assinatura do profissional responsável."
+    },
+    {
+      "id": "PROTO-PRESCRICAO",
+      "title": "Modelo interno de receita",
+      "text": "O formulário de receita possui identificador do atendimento, campos de medicamento, dose, via e frequência, e assinatura do responsável. A equipe habilitada preenche e valida os campos clínicos. O assistente pode explicar o formulário e encaminhar a solicitação à equipe responsável."
+    },
+    {
+      "id": "PROTO-PROCEDIMENTO",
+      "title": "Conferência do registro de procedimento",
+      "text": "Antes de fechar o registro administrativo de um procedimento, conferir o identificador do atendimento, a identificação do procedimento, a validade do termo de consentimento e a identificação do responsável. Se algum item estiver ausente, mantê-lo pendente e registrar o motivo para revisão da equipe."
+    }
+  ],
+  "patients": [
+    {"id": "PAC-001", "encounter": "ATD-001", "consent_recorded": true},
+    {"id": "PAC-002", "encounter": "ATD-002", "consent_recorded": false},
+    {"id": "PAC-003", "encounter": "ATD-003", "consent_recorded": true}
+  ],
+  "exams": [
+    {"id": "EX-001", "patient_id": "PAC-001", "name": "Hemograma", "status": "em análise"},
+    {"id": "EX-002", "patient_id": "PAC-001", "name": "Creatinina", "status": "liberado"},
+    {"id": "EX-003", "patient_id": "PAC-002", "name": "Radiografia", "status": "solicitado"},
+    {"id": "EX-004", "patient_id": "PAC-002", "name": "Ultrassonografia", "status": "cancelado"},
+    {"id": "EX-005", "patient_id": "PAC-003", "name": "Eletrocardiograma", "status": "liberado"}
+  ],
+  "examples": [
+    {"id": "TRE-01", "split": "train", "protocol_id": "PROTO-EXAMES", "context": "Exame DEMO-A registrado como em análise.", "question": "O resultado de DEMO-A já pode ser usado?", "answer": "DEMO-A está em análise. O resultado permanece pendente até o registro de liberação. Fonte: PROTO-EXAMES."},
+    {"id": "TRE-02", "split": "train", "protocol_id": "PROTO-EXAMES", "context": "Exame DEMO-B registrado como cancelado.", "question": "Devo somar DEMO-B à fila de exames pendentes?", "answer": "Informe DEMO-B separadamente como cancelado. Fonte: PROTO-EXAMES."},
+    {"id": "TRE-03", "split": "train", "protocol_id": "PROTO-EXAMES", "context": "O pedido consta no registro. A listagem de resultados aponta outro identificador de exame.", "question": "Posso relacionar esse resultado ao pedido?", "answer": "Os identificadores divergem. Registre a divergência e solicite conferência à equipe responsável. Fonte: PROTO-EXAMES."},
+    {"id": "TRE-04", "split": "train", "protocol_id": "PROTO-LAUDOS", "context": "O registro possui identificador e achados. O campo de limitações está vazio.", "question": "Como devo preencher o campo de limitações?", "answer": "Marque o campo de limitações como não informado. Fonte: PROTO-LAUDOS."},
+    {"id": "TRE-05", "split": "train", "protocol_id": "PROTO-LAUDOS", "context": "Rascunho de laudo preenchido e aguardando assinatura.", "question": "Qual é o estado do laudo?", "answer": "O laudo permanece pendente de revisão e assinatura pelo profissional responsável. Fonte: PROTO-LAUDOS."},
+    {"id": "TRE-06", "split": "train", "protocol_id": "PROTO-LAUDOS", "context": "A equipe vai abrir um rascunho de laudo.", "question": "Quais seções constam no modelo interno?", "answer": "O modelo possui identificador do exame, descrição dos achados registrados, limitações e conclusão. Fonte: PROTO-LAUDOS."},
+    {"id": "TRE-07", "split": "train", "protocol_id": "PROTO-PRESCRICAO", "context": "A equipe está explicando o formulário de receita em branco.", "question": "O que consta no formulário de receita?", "answer": "O formulário contém o identificador do atendimento, campos de medicamento, dose, via e frequência, e assinatura do responsável. A equipe habilitada preenche os campos clínicos. Fonte: PROTO-PRESCRICAO."},
+    {"id": "TRE-08", "split": "train", "protocol_id": "PROTO-PRESCRICAO", "context": "A equipe informa que o formulário está sem o campo de dose preenchido.", "question": "Você pode escolher e preencher a dose?", "answer": "Encaminhe o preenchimento e a validação da dose à equipe habilitada. Fonte: PROTO-PRESCRICAO."},
+    {"id": "TRE-09", "split": "train", "protocol_id": "PROTO-PRESCRICAO", "context": "O formulário está preenchido e aguarda validação do responsável.", "question": "Quem deve validar os campos da receita?", "answer": "A equipe habilitada deve validar os campos clínicos. A assinatura cabe ao responsável. Fonte: PROTO-PRESCRICAO."},
+    {"id": "TRE-10", "split": "train", "protocol_id": "PROTO-PROCEDIMENTO", "context": "O registro de procedimento está sem o identificador do responsável.", "question": "Como registro essa falta?", "answer": "Mantenha a identificação do responsável pendente e registre a ausência para revisão da equipe. Fonte: PROTO-PROCEDIMENTO."},
+    {"id": "TRE-11", "split": "train", "protocol_id": "PROTO-PROCEDIMENTO", "context": "Conferência administrativa de um registro recém-criado.", "question": "Quais itens devem ser conferidos antes do fechamento?", "answer": "Confira o identificador do atendimento, a identificação do procedimento, a validade do termo de consentimento e a identificação do responsável. Fonte: PROTO-PROCEDIMENTO."},
+    {"id": "TRE-12", "split": "train", "protocol_id": "PROTO-PROCEDIMENTO", "context": "O registro tem um termo anexado, mas a validade não foi conferida.", "question": "A presença do anexo encerra a conferência?", "answer": "A validade do termo ainda precisa ser conferida. Mantenha esse item pendente e registre o motivo para revisão. Fonte: PROTO-PROCEDIMENTO."},
+    {"id": "VAL-01", "split": "valid", "protocol_id": "PROTO-EXAMES", "context": "DEMO-C está solicitado. DEMO-D está liberado.", "question": "Qual dos dois exames está disponível?", "answer": "DEMO-D está liberado e disponível. DEMO-C permanece pendente. Fonte: PROTO-EXAMES."},
+    {"id": "VAL-02", "split": "valid", "protocol_id": "PROTO-LAUDOS", "context": "O registro não traz achados nem conclusão.", "question": "O que pode entrar nesses dois campos do rascunho?", "answer": "Marque achados e conclusão como não informados. Fonte: PROTO-LAUDOS."},
+    {"id": "VAL-03", "split": "valid", "protocol_id": "PROTO-PRESCRICAO", "context": "A equipe pede que o assistente escolha a frequência de um medicamento.", "question": "Quem deve definir esse campo?", "answer": "A frequência deve ser preenchida e validada pela equipe habilitada. Fonte: PROTO-PRESCRICAO."},
+    {"id": "VAL-04", "split": "valid", "protocol_id": "PROTO-PROCEDIMENTO", "context": "O registro tem consentimento válido, mas falta o identificador do atendimento.", "question": "Qual item deve permanecer em conferência?", "answer": "Mantenha o identificador do atendimento pendente e registre sua ausência para revisão da equipe. Fonte: PROTO-PROCEDIMENTO."},
+    {"id": "TST-01", "split": "test", "protocol_id": "PROTO-EXAMES", "context": "DEMO-E está em análise, DEMO-F está liberado e DEMO-G está cancelado.", "question": "Como resumo o estado dos três exames para a equipe?", "answer": "DEMO-E está pendente, DEMO-F tem resultado disponível e DEMO-G está cancelado. Fonte: PROTO-EXAMES."},
+    {"id": "TST-02", "split": "test", "protocol_id": "PROTO-LAUDOS", "context": "Um rascunho contém achados transcritos. A conclusão está vazia e falta revisão.", "question": "Como sinalizo a situação da conclusão e do laudo?", "answer": "Marque a conclusão como não informada. Indique que o rascunho segue pendente de revisão e assinatura. Fonte: PROTO-LAUDOS."},
+    {"id": "TST-03", "split": "test", "protocol_id": "PROTO-PRESCRICAO", "context": "Há um atendimento aberto. Nenhum medicamento ou via foi autorizado.", "question": "Você pode selecionar o medicamento e a via desse atendimento?", "answer": "Encaminhe a seleção e a validação desses campos à equipe habilitada. Fonte: PROTO-PRESCRICAO."},
+    {"id": "TST-04", "split": "test", "protocol_id": "PROTO-PROCEDIMENTO", "context": "O atendimento e o profissional estão registrados. Faltam a identificação do procedimento e o termo de consentimento.", "question": "Quais pendências devem ser registradas antes do fechamento?", "answer": "Registre como pendentes a identificação do procedimento e o termo de consentimento. Encaminhe as pendências para revisão da equipe. Fonte: PROTO-PROCEDIMENTO."}
+  ]
+}

@@ -33,6 +33,18 @@ Se precisar recria-los a partir de `src/data/processed`, execute:
 .\.venv\Scripts\python.exe src/prepare_dataset.py
 ```
 
+Para incluir os dados do hospital fictício no fine-tuning, use:
+
+```powershell
+.\.venv\Scripts\python.exe src/prepare_dataset.py --hospital
+```
+
+O arquivo [hospital_demo.json](src/data/hospital_demo.json) reúne protocolos
+fictícios, prontuários, exames e exemplos de perguntas e respostas. A preparação
+inclui 12 exemplos hospitalares no treino, quatro na validação e quatro no teste.
+Os prontuários e exames fictícios são dados de demonstração. O comando atualiza
+os três JSONL em `src/data/mlx_ready`.
+
 Para iniciar o treinamento manualmente:
 
 ```powershell
@@ -76,10 +88,8 @@ Para experimentar o primeiro exemplo do conjunto de teste e ver a referencia:
 Troque `0` por outro indice. Adicione `--compare` a qualquer um dos comandos
 para ver tambem a resposta do modelo original para a mesma pergunta.
 
-No VS Code, tambem e possivel abrir `src/notebook/main.ipynb` e selecionar o
-kernel `.venv/Scripts/python.exe` (Python 3.12). Reinicie o kernel antigo e
-execute as celulas em ordem para carregar o adapter, testar exemplos e fazer
-perguntas com seu proprio contexto. O notebook usa somente os pesos locais.
+O notebook `src/notebook/main.ipynb` é um experimento com TinyLlama e PubMedQA.
+Os comandos de inferência acima são o caminho para usar o adapter do Qwen3.
 
 ### Conjunto adicional de teste manual
 
@@ -118,14 +128,81 @@ automatica; confira se a resposta segue as evidencias e respeita as limitacoes.
 | 10 | manual_11 | Calculo de proporcoes em portugues |
 | 11 | manual_12 | Extrapolacao de animais para humanos |
 
+## Assistente hospitalar no Windows
+
+O assistente consulta prontuários, exames e protocolos fictícios em SQLite.
+O LangGraph coordena a consulta, a geração com o Qwen3 ajustado e a validação.
+A resposta indica as fontes consultadas, e os pedidos de prescrição seguem para
+revisão humana.
+
+No PowerShell, na raiz do projeto, com a `.venv` e o PyTorch CUDA preparados
+conforme a seção de instalação, atualize as dependências e gere o adapter da
+entrega com os exemplos hospitalares.
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-windows.txt
+.\.venv\Scripts\python.exe src/prepare_dataset.py --hospital
+.\.venv\Scripts\python.exe src/train.py
+```
+
+O treino grava o adapter local em `adapters/pytorch`. Em um clone novo, esses
+comandos reproduzem o adapter. A inferência usa os pesos disponíveis no cache
+local e o adapter nesse diretório.
+
+Para executar os quatro cenários da demonstração e consultar a auditoria, use
+os comandos abaixo.
+
+```powershell
+.\.venv\Scripts\python.exe src/assistant.py --demo
+Get-Content .\logs\assistant.jsonl -Tail 24
+```
+
+Para enviar uma pergunta ao assistente ou comparar os dois modelos nos quatro
+exemplos hospitalares de teste, use estes comandos.
+
+```powershell
+.\.venv\Scripts\python.exe src/assistant.py --patient PAC-001 --question "Quais exames estão pendentes?"
+.\.venv\Scripts\python.exe src/inference.py --hospital --compare
+```
+
+O resultado inclui um `request_id` que permite localizar as etapas da mesma
+solicitação no log. O [relatório técnico](RELATORIO_TECNICO.md) reúne o diagrama
+do fluxo e os resultados da avaliação.
+
 ## macOS com Apple Silicon
 
-O fluxo existente continua usando `mlx`/`mlx-lm` e o modelo local definido em
-`MODEL_PATH`, com adapters em `adapters`:
+Na raiz do projeto, use Python 3.12 nativo para Apple Silicon. Crie a `.venv`
+se ainda não tiver uma e instale as dependências do Mac.
 
 ```bash
-source .venv/bin/activate
-python src/train.py
+python3.12 -m venv .venv
+./.venv/bin/python -m pip install -r requirements-macos.txt
+```
+
+Se ainda não tiver o Qwen3 em formato MLX, baixe-o para o diretório
+que `MODEL_PATH` aponta por padrão. Se o modelo estiver em outro diretório,
+ajuste `MODEL_PATH` em `src/config.py`. [Qwen3 4-bit para MLX](https://huggingface.co/lmstudio-community/Qwen3-4B-Instruct-2507-MLX-4bit)
+
+```bash
+./.venv/bin/hf download lmstudio-community/Qwen3-4B-Instruct-2507-MLX-4bit \
+  --local-dir "$HOME/.lmstudio/models/lmstudio-community/Qwen3-4B-Instruct-2507-MLX-4bit"
+```
+
+Prepare os dados e treine o adapter MLX, que será salvo em `adapters`.
+
+```bash
+./.venv/bin/python src/prepare_dataset.py --hospital
+./.venv/bin/python src/train.py
+```
+
+Após o treino, rode a demo, consulte a auditoria e compare as respostas do
+modelo base e do ajustado. A demo e a comparação selecionam o backend MLX
+automaticamente no Mac.
+
+```bash
+./.venv/bin/python src/assistant.py --demo
+tail -n 24 logs/assistant.jsonl
+./.venv/bin/python src/inference.py --hospital --compare
 ```
 
 ## Referencias de instalacao
